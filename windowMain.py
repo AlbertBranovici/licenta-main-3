@@ -2,6 +2,7 @@ from PyQt5.QtGui import QIcon, QPainter, QColor
 from PyQt5.QtWidgets import QMenu, QMenuBar
 from entryDialogUI import *
 from pathlib import Path
+from autoType import *
 from criptare import *
 import platform
 # from saveDialogUI import saveDialogUI
@@ -96,6 +97,11 @@ class MainWin(QMainWindow):
         copyPasswordAction = QAction(QIcon('icons/key.svg'), 'Copy Password', self)
         copyPasswordAction.triggered.connect(self.copy_password)
 
+        autoTypeAction = QAction(QIcon('icons/keyboard.svg'), 'Auto-type', self)
+        autoTypeAction.setShortcut('Ctrl+G')
+        autoTypeAction.setToolTip('Perform Auto-type')
+        autoTypeAction.triggered.connect(self.begin_auto_type)
+
         menuSeparator = QAction('|',self)
         menuSeparator.setEnabled(False)
 
@@ -106,6 +112,7 @@ class MainWin(QMainWindow):
         # iconMenu.addSeparator()
         iconMenu.addAction(copyUserAction)
         iconMenu.addAction(copyPasswordAction)
+        iconMenu.addAction(autoTypeAction)
         # iconMenu.addAction(menuSeparator)
 
 
@@ -123,6 +130,14 @@ class MainWin(QMainWindow):
         # layout.addWidget(iconMenu,1,0)
         # layout.addWidget(self.table,2,0)
         # self.setLayout(layout)
+
+    def begin_auto_type(self):
+        row = self.table.currentRow()
+        user = self.table.item(row, 1).text()
+        password = self.table.item(row,2).text()
+        auto_type(user, password)
+
+
 
     def send_to_clipboard(self,text):
         clipboard = QApplication.clipboard()

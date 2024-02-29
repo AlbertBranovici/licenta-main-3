@@ -23,7 +23,6 @@ def decriptare(key, cipherText, iv):
     decrypt_cipher = AES.new(key, AES.MODE_CBC, iv)
     originalText = unpad(decrypt_cipher.decrypt(cipherText), AES.block_size)
     return originalText
-# file_path = r'C:\Users\Albert\Desktop\Licenta\encrypted_data.json'
 
 def read_and_decrypt(file_path, masterKey):
     with open(file_path, 'r') as file:

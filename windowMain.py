@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import QMenu, QMenuBar
 from entryDialogUI import *
 from pathlib import Path
 from autoType import *
-from criptare import *
+from encryption import *
 import platform
 # from saveDialogUI import saveDialogUI
 

@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import Qt
 # from windowMain import *
 from windowMain import MainWin
-from criptare import *
+from encryption import *
 
 
 class openDialogUI(QDialog):

@@ -1,8 +1,18 @@
+import subprocess
+import requests
+from PyQt5.QtCore import QProcess
 from PyQt5.QtGui import QIcon, QPainter, QColor
 from PyQt5.QtWidgets import QMenu, QMenuBar
+from django.test import RequestFactory
+
 from entryDialogUI import *
 from pathlib import Path
 from autoType import *
+
+import requests
+from django.middleware.csrf import get_token
+
+import sys
 from encryption import *
 import platform
 # from saveDialogUI import saveDialogUI
@@ -18,6 +28,9 @@ class MainWin(QMainWindow):
     def __init__(self):
         super().__init__()
 
+
+        self.server_process = None
+        self.start_server()
 
         self.setWindowTitle('Licenta')
         self.resize(686, 340)
@@ -102,6 +115,16 @@ class MainWin(QMainWindow):
         autoTypeAction.setToolTip('Perform Auto-type')
         autoTypeAction.triggered.connect(self.begin_auto_type)
 
+        # testare
+
+        sendData = QAction('Send data', self)
+        sendData.triggered.connect(self.send_data)
+
+
+
+        # testare
+
+
         menuSeparator = QAction('|',self)
         menuSeparator.setEnabled(False)
 
@@ -113,6 +136,10 @@ class MainWin(QMainWindow):
         iconMenu.addAction(copyUserAction)
         iconMenu.addAction(copyPasswordAction)
         iconMenu.addAction(autoTypeAction)
+
+
+        iconMenu.addAction(sendData)
+
         # iconMenu.addAction(menuSeparator)
 
 
@@ -130,6 +157,56 @@ class MainWin(QMainWindow):
         # layout.addWidget(iconMenu,1,0)
         # layout.addWidget(self.table,2,0)
         # self.setLayout(layout)
+
+
+
+    def send_data(self):
+
+        # URL of your Django server endpoint
+        # url = 'http://127.0.0.1:8000/dataApp/post'
+        url = 'http://127.0.0.1:8000/dataApp/api/data/'
+        # Data to send (replace with your actual data)
+
+        table_data = self.get_table_data()
+        data = {}
+        for i, item in enumerate(table_data, start=1):
+            data[i] = item
+
+        # print(type(data))
+        # print(data)
+
+        # dummy_request = RequestFactory().get('/')
+        # csrf_token = get_token(dummy_request)
+        # headers = {'X-CSRFToken': csrf_token}
+        # response = requests.post(url, data=data, headers=headers)
+        response = requests.post(url, data=data)
+
+        # Check if request was successful (HTTP status code 200)
+        if response.status_code == 200:
+            print('Data sent successfully')
+        else:
+            print('Error sending data:', response.text)
+
+    def closeEvent(self, event):
+        # Stop the Django server when the application is closed
+        self.stop_server()
+        event.accept()
+
+    def start_server(self):
+        if self.server_process is None:
+            try:
+                self.server_process = subprocess.Popen(['python', 'mysite/manage.py', 'runserver'])
+            except FileNotFoundError:
+                print("Error: 'python' command not found. Make sure Python is installed and added to the system PATH.")
+        else:
+            print("Server already running")
+
+    def stop_server(self):
+        if self.server_process is not None:
+            self.server_process.terminate()
+            self.server_process.wait()
+            self.server_process = None
+            print("Server stopped")
 
     def begin_auto_type(self):
         row = self.table.currentRow()

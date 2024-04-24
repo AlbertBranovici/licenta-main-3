@@ -172,13 +172,6 @@ class MainWin(QMainWindow):
         for i, item in enumerate(table_data, start=1):
             data[i] = item
 
-        # print(type(data))
-        # print(data)
-
-        # dummy_request = RequestFactory().get('/')
-        # csrf_token = get_token(dummy_request)
-        # headers = {'X-CSRFToken': csrf_token}
-        # response = requests.post(url, data=data, headers=headers)
         response = requests.post(url, data=data)
 
         # Check if request was successful (HTTP status code 200)

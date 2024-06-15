@@ -1,13 +1,10 @@
-import sys
 from PyQt5.QtWidgets import *
-from PyQt5.QtCore import Qt
-# from windowMain import *
 from windowMain import MainWin
 from encryption import *
 
 
 class openDialogUI(QDialog):
-    def __init__(self, parent = None, mainWin=None):
+    def __init__(self, parent=None, mainWin=None):
         super().__init__(parent)
         self.setWindowTitle("Open Data Base")
         self.resize(240, 150)
@@ -22,16 +19,24 @@ class openDialogUI(QDialog):
         passwordLayout.addWidget(passwordLabel)
         passwordLayout.addWidget(self.passwordEdit)
 
-
+        self.showButton = QPushButton(self)
+        self.showButton.setText("Show Password")
+        self.showButton.clicked.connect(self.showButton_clicked)
 
         self.ok_button = QPushButton("OK")
+        self.ok_button.setFocus()
         self.ok_button.clicked.connect(self.ok_clicked)
-
-
 
         layout.addRow(passwordLayout)
         layout.addWidget(self.ok_button)
+        layout.addWidget(self.showButton)
         self.setLayout(layout)
+
+    def showButton_clicked(self):
+        if self.passwordEdit.echoMode() == QLineEdit.Password:
+            self.passwordEdit.setEchoMode(QLineEdit.Normal)
+        else:
+            self.passwordEdit.setEchoMode(QLineEdit.Password)
 
     def ok_clicked(self):
         try:

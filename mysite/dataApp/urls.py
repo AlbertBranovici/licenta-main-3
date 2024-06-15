@@ -3,11 +3,10 @@ from django.urls import path
 from .views import MyAPIView
 
 urlpatterns = [
-    # path('post', views.post, name='post'),
     path('api/data/', MyAPIView.as_view(), name='api-data'),
-    # path('get', views.get, name='get'),
-    # path("post", views.MyAPIView.post, name="post"),  # For handling POST requests
-    # path("get", views.MyAPIView.get, name="get"),
+    # path('api/add_data/', MyAPIView.as_view(methods=['post']), name='api-add-data'),
+
+    # path('api/add_data/', MyAPIView.add_data, name='api-add-data'),
 ]
 
 # urlpatterns = [

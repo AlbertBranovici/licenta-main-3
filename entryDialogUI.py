@@ -1,13 +1,5 @@
-import sys
-from PyQt5.QtWidgets import *
-from PyQt5.QtCore import Qt
-
 from generatePasswordUI import *
 from generatePasswordUI import generatePasswordUI
-
-
-# from generatePasswordUI import generatePasswordUI
-
 
 class entryDialog(QDialog):
     def __init__(self, parent = None):

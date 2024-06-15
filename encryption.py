@@ -1,9 +1,6 @@
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad, unpad
-import json
-import os
-import hashlib
-import base64
+import json, os, hashlib, base64
 
 def generate_salt():
     return os.urandom(16)
@@ -24,6 +21,9 @@ def decriptare(key, cipherText, iv):
     originalText = unpad(decrypt_cipher.decrypt(cipherText), AES.block_size)
     return originalText
 
+def validate_masterKey(inputKey, stored_salt, stored_hash):
+    new_hash = generate_hash(inputKey, stored_salt)
+    return new_hash == stored_hash
 def read_and_decrypt(file_path, masterKey):
     with open(file_path, 'r') as file:
         encrypted_data = json.load(file)
@@ -52,8 +52,6 @@ def read_and_decrypt(file_path, masterKey):
         decrypted_data.append(decryptedRow)
     return decrypted_data
 
-
-
 def encrypt_and_save(data,masterKey,file_path):
 
     masterKey = masterKey.encode("utf-8")
@@ -62,11 +60,12 @@ def encrypt_and_save(data,masterKey,file_path):
     storedHash = [hash,salt]
     encoded_list = [base64.b64encode(data).decode('utf-8') for data in storedHash]
 
-    # aici de documentat cum se poate stoca in format securizat hash-ul si salt-ul pentru validare
-    # ---------------------------
     encryptedData = []
     encryptedData.append(encoded_list)
+    print("data : ", data)
+
     for list in data:
+        print("list: ", list)
         row_str = '||'.join(list)
         encryptedRow, iv = criptare(masterKey, row_str.encode('utf-8'))
         encryptedData.append({
@@ -76,5 +75,8 @@ def encrypt_and_save(data,masterKey,file_path):
         print(row_str)
     with open(file_path, "w") as file:
         json.dump(encryptedData, file)
+
+
+
 
 #     de completat cu functie de hasing pt a asigura lungimea de 16 bytes pentru cryptare--------

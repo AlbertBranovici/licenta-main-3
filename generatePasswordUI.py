@@ -22,9 +22,6 @@ class generatePasswordUI(QDialog):
         hbox.addWidget(lenLabel)
         hbox.addWidget(self.lenSpinBox)
 
-
-
-
         # Values for each box
         self.upperCase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
         self.lowerCase = 'abcdefghijklmnopqrstuvwxyz'
@@ -34,7 +31,6 @@ class generatePasswordUI(QDialog):
         self.minus = '-'
         self. space = ' '
         self.brackets = '[]{}()'
-
 
         # Grid for password options
         gridLayout = QGridLayout()
@@ -63,7 +59,6 @@ class generatePasswordUI(QDialog):
         self.reviewPassword.setReadOnly(True)
         self.reviewPassword.setBaseSize(100,100)
         reviewPasswordLabel = QLabel("Review")
-
 
         mainLayout.addLayout(hbox)
         mainLayout.addLayout(gridLayout)

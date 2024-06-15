@@ -1,33 +1,24 @@
 import subprocess
-import requests
-from PyQt5.QtCore import QProcess
-from PyQt5.QtGui import QIcon, QPainter, QColor
+from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QMenu, QMenuBar
-from django.test import RequestFactory
-
 from entryDialogUI import *
 from pathlib import Path
 from autoType import *
-
 import requests
-from django.middleware.csrf import get_token
 
-import sys
-from encryption import *
-import platform
-# from saveDialogUI import saveDialogUI
 
 class StarDelegate(QStyledItemDelegate):
     def paint(self, painter, option, index):
         text = index.data(Qt.DisplayRole)
         star_text = '*' * len(str(text))
         painter.drawText(option.rect, Qt.AlignCenter, star_text)
-# class MainWin(QWidget):
+
+
 class MainWin(QMainWindow):
     tableDataSignal = pyqtSignal(list)
+
     def __init__(self):
         super().__init__()
-
 
         self.server_process = None
         self.start_server()
@@ -35,7 +26,7 @@ class MainWin(QMainWindow):
         self.setWindowTitle('Licenta')
         self.resize(686, 340)
         # --Table--
-        self.table = QTableWidget(0,5,self)
+        self.table = QTableWidget(0, 5, self)
         self.table.setHorizontalHeaderLabels(['Title', 'User Name', 'Password', 'URL', 'Notes'])
         self.table.setEditTriggers(QTableWidget.NoEditTriggers)
         self.table.setContextMenuPolicy(Qt.CustomContextMenu)
@@ -46,17 +37,9 @@ class MainWin(QMainWindow):
         # --------
 
         self.file_path = ''
-        # if platform.uname().system.startswith('Darw'):
-        #     #     aici este pentru macOS
-        #     menu = QMenuBar()
-        # else:
-        #     menu = QMenuBar(self)
-        #     #     aici este pentru windows
-        # # Menubar---
         tray = QSystemTrayIcon()
         menu = QMenuBar(self)
         menu.setNativeMenuBar(False)
-
 
         actionFile = menu.addMenu("&File")
         newFile = QAction("New", self)
@@ -77,7 +60,6 @@ class MainWin(QMainWindow):
         actionFile.addAction(saveFile)
         actionFile.addAction(close)
 
-
         actionEntry = menu.addMenu("&Entry")
         # Se initializeaza actiunile care sunt adaugate in meniul Entry
         addEntryAction = QAction("Add Entry", self)
@@ -96,7 +78,7 @@ class MainWin(QMainWindow):
         #Icon menu bar
         iconMenu = QMenuBar(self)
         iconMenu.setNativeMenuBar(False)
-        newAction = QAction(QIcon('icons/file-regular.svg'),'New File', self)
+        newAction = QAction(QIcon('icons/file-regular.svg'), 'New File', self)
 
         saveAction = QAction(QIcon('icons/floppy-disk.svg'), 'Save File', self)
         saveAction.triggered.connect(self.save_data)
@@ -118,17 +100,14 @@ class MainWin(QMainWindow):
         # testare
 
         sendData = QAction('Send data', self)
-        sendData.triggered.connect(self.send_data)
-
-
+        sendData.triggered.connect(self.test)
 
         # testare
 
-
-        menuSeparator = QAction('|',self)
+        menuSeparator = QAction('|', self)
         menuSeparator.setEnabled(False)
 
-        iconMenu.addAction(newAction)
+        # iconMenu.addAction(newAction)
         iconMenu.addAction(saveAction)
         iconMenu.addAction(openAction)
         iconMenu.addAction(menuSeparator)
@@ -136,45 +115,32 @@ class MainWin(QMainWindow):
         iconMenu.addAction(copyUserAction)
         iconMenu.addAction(copyPasswordAction)
         iconMenu.addAction(autoTypeAction)
-
-
         iconMenu.addAction(sendData)
 
-        # iconMenu.addAction(menuSeparator)
-
-
-        # tray.setContextMenu(menu)
-        # tray.setContextMenu(iconMenu)
         self.setMenuBar(menu)
         layout = QGridLayout()
         layout.addWidget(menu, 0, 0)
-        layout.addWidget(iconMenu,1,0)
-        layout.addWidget(self.table,2,0)
+        layout.addWidget(iconMenu, 1, 0)
+        layout.addWidget(self.table, 2, 0)
         self.central_widget = QWidget()
         self.central_widget.setLayout(layout)
         self.setCentralWidget(self.central_widget)
-        # layout.addWidget(menu,0,0)
-        # layout.addWidget(iconMenu,1,0)
-        # layout.addWidget(self.table,2,0)
-        # self.setLayout(layout)
 
-
-
+    def return_file_path(self):
+        return self.file_path
+    def test(self):
+        table_data = self.get_table_data()
+        print("tableData = ",table_data)
+        print("tableDataType = ",type(table_data))
+        self.send_data()
     def send_data(self):
-
-        # URL of your Django server endpoint
-        # url = 'http://127.0.0.1:8000/dataApp/post'
         url = 'http://127.0.0.1:8000/dataApp/api/data/'
-        # Data to send (replace with your actual data)
-
         table_data = self.get_table_data()
         data = {}
         for i, item in enumerate(table_data, start=1):
             data[i] = item
 
         response = requests.post(url, data=data)
-
-        # Check if request was successful (HTTP status code 200)
         if response.status_code == 200:
             print('Data sent successfully')
         else:
@@ -204,14 +170,13 @@ class MainWin(QMainWindow):
     def begin_auto_type(self):
         row = self.table.currentRow()
         user = self.table.item(row, 1).text()
-        password = self.table.item(row,2).text()
+        password = self.table.item(row, 2).text()
         auto_type(user, password)
 
-
-
-    def send_to_clipboard(self,text):
+    def send_to_clipboard(self, text):
         clipboard = QApplication.clipboard()
         clipboard.setText(text)
+
     def copy_password(self):
         try:
             current_row = self.table.currentRow()
@@ -219,10 +184,11 @@ class MainWin(QMainWindow):
             self.send_to_clipboard(password)
         except Exception as e:
             print(f"An error ocurred: {e}")
+
     def copy_username(self):
         try:
             current_row = self.table.currentRow()
-            user = self.table.item(current_row,1).text()
+            user = self.table.item(current_row, 1).text()
             self.send_to_clipboard(user)
         except Exception as e:
             print(f"An error ocurred: {e}")
@@ -244,6 +210,7 @@ class MainWin(QMainWindow):
             self.table.removeRow(current_row)
         elif action == addAction:
             self.addEntry()
+
     def addEntry(self):
         try:
             row_number = self.table.rowCount()
@@ -251,10 +218,11 @@ class MainWin(QMainWindow):
             if dialog.exec_() == QDialog.Accepted:
                 new_data = dialog.data()
                 self.table.insertRow(row_number)
-                for i, (key,value) in enumerate(new_data.items()):
+                for i, (key, value) in enumerate(new_data.items()):
                     self.table.setItem(row_number, i, QTableWidgetItem(value))
         except Exception as e:
             print(f"An error ocurred: {e}")
+
     def editEntry(self):
         try:
             current_row = self.table.currentRow()
@@ -289,6 +257,7 @@ class MainWin(QMainWindow):
                     current_row_data.append("")
             data.append(current_row_data)
         return data
+
     def open_file(self):
         options = QFileDialog.Options()
         fileName, _ = QFileDialog.getOpenFileName(
@@ -307,13 +276,13 @@ class MainWin(QMainWindow):
             except Exception as e:
                 print(e)
 
-
     def update_data(self, data):
         self.table.setRowCount(len(data))
         for row_index, row_data in enumerate(data):
             for column_index, item_data in enumerate(row_data):
                 item = QTableWidgetItem(str(item_data))
                 self.table.setItem(row_index, column_index, item)
+        self.send_data()
 
     def get_saveFile_path(self):
         options = QFileDialog.Options()
@@ -330,13 +299,22 @@ class MainWin(QMainWindow):
 
     def save_data(self):
         try:
-            self.file_path = self.get_saveFile_path()
             if self.file_path is None:
-                return
-            from saveDialogUI import saveDialogUI
-            save_dialog = saveDialogUI(self, mainWin=self)
-            if save_dialog.exec_() == QDialog.Accepted:
-                pass
+                self.file_path = self.get_saveFile_path()
+                if self.file_path is None:
+                    return
+                from saveDialogUI import saveDialogUI
+                save_dialog = saveDialogUI(self, mainWin=self)
+                if save_dialog.exec_() == QDialog.Accepted:
+                    pass
+            else:
+                from saveDialogUI import saveDialogUI
+                save_dialog = saveDialogUI(self, mainWin=self)
+                if save_dialog.exec_() == QDialog.Accepted:
+                    pass
+                # table_data = self.get_table_data()
+                # primaryKey = self.
+
         except Exception as e:
             print(e)
             return
